@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import type { Student, EventType } from '../types'
-import { mockCampuses } from '../data/mockData'
 import { useStore } from '../store/useStore'
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
@@ -18,6 +17,7 @@ interface EditProfileModalProps {
 
 export default function EditProfileModal({ student, onClose }: EditProfileModalProps) {
   const updateStudent = useStore((s) => s.updateStudent)
+  const campuses = useStore((s) => s.campuses)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [name, setName] = useState(student.name)
@@ -211,7 +211,7 @@ export default function EditProfileModal({ student, onClose }: EditProfileModalP
                 borderRadius: 4,
               }}
             >
-              {mockCampuses.map((c) => (
+              {campuses.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>

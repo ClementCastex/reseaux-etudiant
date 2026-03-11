@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { mockCampuses } from '../data/mockData'
 import EditProfileModal from '../components/EditProfileModal'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -17,9 +16,10 @@ export default function ProfilePage() {
   const currentUser = useStore((s) => s.currentUser)
   const students = useStore((s) => s.students)
 
+  const campuses = useStore((s) => s.campuses)
   const studentIdToShow = studentId || currentUser?.id
   const student = students.find((s) => s.id === studentIdToShow)
-  const campus = student ? mockCampuses.find((c) => c.id === student.campusId) : null
+  const campus = student ? campuses.find((c) => c.id === student.campusId) : null
   const isOwnProfile = currentUser?.id === studentIdToShow
 
   const [showEditModal, setShowEditModal] = useState(false)

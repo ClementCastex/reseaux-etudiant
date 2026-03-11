@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { mockCampuses } from '../data/mockData'
 import type { Student } from '../types'
 
 export default function AuthPage() {
@@ -9,7 +8,11 @@ export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
-  const [campusId, setCampusId] = useState(mockCampuses[0]?.id ?? '')
+  const campuses = useStore((s) => s.campuses)
+  const [campusId, setCampusId] = useState('')
+  useEffect(() => {
+    if (campuses.length > 0 && !campusId) setCampusId(campuses[0].id)
+  }, [campuses, campusId])
   const [error, setError] = useState('')
 
   const setCurrentUser = useStore((s) => s.setCurrentUser)
@@ -29,22 +32,25 @@ export default function AuthPage() {
     navigate('/')
   }
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     if (!name.trim()) {
       setError('Le nom est requis')
       return
     }
-    const newStudent: Student = {
-      id: `s${Date.now()}`,
-      email: email || `user${Date.now()}@campus.fr`,
-      name: name.trim(),
-      campusId: campusId || mockCampuses[0].id,
+    try {
+      const created = await addStudent({
+        id: '',
+        email: email || `user${Date.now()}@campus.fr`,
+        name: name.trim(),
+        campusId: campusId || campuses[0]?.id || '',
+      })
+      setCurrentUser(created)
+      navigate('/')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur inscription')
     }
-    addStudent(newStudent)
-    setCurrentUser(newStudent)
-    navigate('/')
   }
 
   const handleSubmit = mode === 'login' ? handleLogin : handleRegister
@@ -126,7 +132,7 @@ export default function AuthPage() {
                     borderRadius: 4,
                   }}
                 >
-                  {mockCampuses.map((c) => (
+                  {campuses.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>

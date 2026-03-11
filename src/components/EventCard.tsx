@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Event } from '../types'
-import { mockCampuses } from '../data/mockData'
+import { useStore } from '../store/useStore'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   soiree: 'Soirée',
@@ -15,7 +15,8 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event }: EventCardProps) {
-  const campus = mockCampuses.find((c) => c.id === event.campusId)
+  const campuses = useStore((s) => s.campuses)
+  const campus = campuses.find((c) => c.id === event.campusId)
   const date = new Date(event.date)
   const dateStr = date.toLocaleDateString('fr-FR', {
     weekday: 'short',

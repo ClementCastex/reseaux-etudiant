@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Campus {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  students Student[]
+  events   Event[]
+
+  @@map("campuses")
+}
+
+model Student {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  name       String
+  campusId   String
+  campus     Campus    @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  avatarUrl  String?
+  bio        String?
+  phone      String?
+  formation  String?
+  interests  String?   // JSON array stored as string
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  createdEvents   Event[]  @relation("EventCreator")
+  participations  Event[]  @relation("EventParticipants")
+
+  @@index([campusId])
+  @@index([email])
+  @@map("students")
+}
+
+model Event {
+  id           String    @id @default(cuid())
+  title        String
+  description  String
+  date         DateTime
+  campusId     String
+  campus       Campus    @relation(fields: [campusId], references: [id], onDelete: Cascade)
+  type         String     // soiree | sport | etude | culture | autre
+  creatorId    String
+  creator      Student   @relation("EventCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  participants Student[] @relation("EventParticipants")
+
+  @@index([campusId])
+  @@index([creatorId])
+  @@index([date])
+  @@map("events")
+}

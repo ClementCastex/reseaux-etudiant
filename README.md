@@ -2,14 +2,19 @@
 
 Application desktop simple de réseau social étudiant entre campus. MVP fonctionnel.
 
-## Lancer le projet
+## Lancer le projet (avec base de données Prisma)
 
 ```bash
 npm install
-npm run dev
+npm run db:migrate   # Créer les tables (si première fois)
+npm run db:seed     # Données de démo
+npm run dev:all     # Frontend + API (ou en 2 terminaux : npm run dev + npm run dev:api)
 ```
 
 Puis ouvrir http://localhost:5173
+
+- **Frontend** : Vite sur port 5173
+- **API** : Express + Prisma sur port 3001 (proxifié via /api)
 
 ## Comptes de démonstration
 
@@ -24,11 +29,20 @@ Puis ouvrir http://localhost:5173
 
 ```
 src/
+├── api/            # Client API (fetch vers /api)
 ├── components/     # Composants réutilisables
 ├── pages/          # Pages de l'application
 ├── store/          # État global (Zustand)
-├── data/            # Données mockées
-└── types/           # Interfaces TypeScript
+├── data/           # Données mock (fallback)
+└── types/          # Interfaces TypeScript
+
+server/
+└── index.ts        # API Express + Prisma
+
+prisma/
+├── schema.prisma   # Schéma DB (Campus, Student, Event)
+├── seed.ts         # Données initiales
+└── migrations/     # Migrations SQLite
 ```
 
 ## Fonctionnalités MVP
@@ -42,8 +56,7 @@ src/
 
 ## À faire ensuite
 
-- Backend (API, BDD)
-- Auth réelle
+- Auth réelle (JWT, sessions)
 - Messagerie
 - Notifications
 - Filtres recherche événements

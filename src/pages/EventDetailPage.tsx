@@ -1,6 +1,6 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { mockCampuses } from '../data/mockData'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   soiree: 'Soirée',
@@ -15,9 +15,11 @@ export default function EventDetailPage() {
   const events = useStore((s) => s.events)
   const students = useStore((s) => s.students)
   const currentUser = useStore((s) => s.currentUser)
+  const campuses = useStore((s) => s.campuses)
   const participateToEvent = useStore((s) => s.participateToEvent)
   const leaveEvent = useStore((s) => s.leaveEvent)
   const isParticipating = useStore((s) => s.isParticipating)
+  const [loading, setLoading] = useState(false)
 
   const event = events.find((e) => e.id === eventId)
 
@@ -30,7 +32,7 @@ export default function EventDetailPage() {
     )
   }
 
-  const campus = mockCampuses.find((c) => c.id === event.campusId)
+  const campus = campuses.find((c) => c.id === event.campusId)
   const creator = students.find((s) => s.id === event.creatorId)
   const date = new Date(event.date)
   const dateStr = date.toLocaleDateString('fr-FR', {
@@ -44,15 +46,25 @@ export default function EventDetailPage() {
 
   const participating = currentUser ? isParticipating(event.id, currentUser.id) : false
 
-  const handleParticipate = () => {
+  const handleParticipate = async () => {
     if (currentUser) {
-      participateToEvent(event.id, currentUser.id)
+      setLoading(true)
+      try {
+        await participateToEvent(event.id, currentUser.id)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
-  const handleLeave = () => {
+  const handleLeave = async () => {
     if (currentUser) {
-      leaveEvent(event.id, currentUser.id)
+      setLoading(true)
+      try {
+        await leaveEvent(event.id, currentUser.id)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 

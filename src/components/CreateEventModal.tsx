@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import type { Event, EventType } from '../types'
-import { mockCampuses } from '../data/mockData'
+import type { EventType } from '../types'
 import { useStore } from '../store/useStore'
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
@@ -17,31 +16,38 @@ interface CreateEventModalProps {
 
 export default function CreateEventModal({ onClose }: CreateEventModalProps) {
   const currentUser = useStore((s) => s.currentUser)
+  const campuses = useStore((s) => s.campuses)
   const addEvent = useStore((s) => s.addEvent)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [date, setDate] = useState('')
-  const [campusId, setCampusId] = useState(currentUser?.campusId ?? mockCampuses[0]?.id ?? '')
+  const [campusId, setCampusId] = useState(currentUser?.campusId ?? campuses[0]?.id ?? '')
   const [type, setType] = useState<EventType>('soiree')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!currentUser || !title.trim() || !date) return
-
-    const newEvent: Event = {
-      id: `e${Date.now()}`,
-      title: title.trim(),
-      description: description.trim(),
-      date,
-      campusId,
-      type,
-      creatorId: currentUser.id,
-      participantIds: [currentUser.id],
-      createdAt: new Date().toISOString(),
+    setSubmitting(true)
+    setError('')
+    try {
+      await addEvent({
+        title: title.trim(),
+        description: description.trim(),
+        date,
+        campusId,
+        type,
+        creatorId: currentUser.id,
+        participantIds: [currentUser.id],
+      })
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur')
+    } finally {
+      setSubmitting(false)
     }
-    addEvent(newEvent)
-    onClose()
   }
 
   return (
@@ -139,7 +145,7 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
                 borderRadius: 4,
               }}
             >
-              {mockCampuses.map((c) => (
+              {campuses.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
@@ -169,6 +175,7 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
             </select>
           </div>
 
+          {error && <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{error}</p>}
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
             <button
               type="button"
@@ -184,6 +191,7 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
             </button>
             <button
               type="submit"
+              disabled={submitting}
               style={{
                 padding: '0.5rem 1rem',
                 background: '#2563eb',
@@ -192,7 +200,7 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
                 borderRadius: 4,
               }}
             >
-              Créer
+              {submitting ? 'Création...' : 'Créer'}
             </button>
           </div>
         </form>
