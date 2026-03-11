@@ -39,12 +39,22 @@ export default function Header() {
             <Link
               to="/profile"
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
                 padding: '0.25rem 0.5rem',
                 background: '#f3f4f6',
-                borderRadius: 4,
+                borderRadius: 20,
                 fontSize: '0.875rem',
               }}
             >
+              {currentUser.avatarUrl ? (
+                <img src={currentUser.avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
+                  {currentUser.name.charAt(0)}
+                </div>
+              )}
               {currentUser.name}
             </Link>
             <button

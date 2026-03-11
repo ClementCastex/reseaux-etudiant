@@ -5,16 +5,34 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "npx tsx watch server/index.ts",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:api\"",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "prisma": "^5.22.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "tsx": "^4.19.2",
+    "concurrently": "^9.1.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",

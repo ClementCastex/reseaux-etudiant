@@ -8,6 +8,16 @@ export interface Student {
   email: string
   name: string
   campusId: string
+  /** URL base64 ou externe de la photo de profil */
+  avatarUrl?: string | null
+  /** Bio courte / description (optionnel) */
+  bio?: string | null
+  /** Numéro de téléphone (optionnel) */
+  phone?: string | null
+  /** Formation / filière d'études (ex: Licence Info, Master MEEF) */
+  formation?: string | null
+  /** Intérêts / centres d'intérêt (pour matcher les événements) */
+  interests?: string[] | null
 }
 
 export type EventType = 'soiree' | 'sport' | 'etude' | 'culture' | 'autre'

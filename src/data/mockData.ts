@@ -7,10 +7,42 @@ export const mockCampuses: Campus[] = [
 ]
 
 export const mockStudents: Student[] = [
-  { id: 's1', email: 'alice@campus.fr', name: 'Alice Martin', campusId: 'c1' },
-  { id: 's2', email: 'bob@campus.fr', name: 'Bob Dupont', campusId: 'c1' },
-  { id: 's3', email: 'clara@campus.fr', name: 'Clara Bernard', campusId: 'c2' },
-  { id: 's4', email: 'david@campus.fr', name: 'David Leroy', campusId: 'c3' },
+  {
+    id: 's1',
+    email: 'alice@campus.fr',
+    name: 'Alice Martin',
+    campusId: 'c1',
+    bio: 'Fan de soirées et d\'événements culturels !',
+    formation: 'Licence Informatique',
+    interests: ['soiree', 'culture'],
+  },
+  {
+    id: 's2',
+    email: 'bob@campus.fr',
+    name: 'Bob Dupont',
+    campusId: 'c1',
+    bio: 'Passionné de sport et d\'équipe.',
+    phone: '06 12 34 56 78',
+    formation: 'Master STAPS',
+    interests: ['sport'],
+  },
+  {
+    id: 's3',
+    email: 'clara@campus.fr',
+    name: 'Clara Bernard',
+    campusId: 'c2',
+    bio: 'Étudiante en école d\'ingé, j\'adore les groupes de révision.',
+    formation: 'École d\'ingénieur',
+    interests: ['etude', 'culture'],
+  },
+  {
+    id: 's4',
+    email: 'david@campus.fr',
+    name: 'David Leroy',
+    campusId: 'c3',
+    formation: 'Licence Éco-Gestion',
+    interests: ['soiree', 'sport'],
+  },
 ]
 
 export const mockEvents: Event[] = [
