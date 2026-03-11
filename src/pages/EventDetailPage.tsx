@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { mockCampuses, mockStudents } from '../data/mockData'
+import { mockCampuses } from '../data/mockData'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   soiree: 'Soirée',
@@ -13,6 +13,7 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 export default function EventDetailPage() {
   const { eventId } = useParams()
   const events = useStore((s) => s.events)
+  const students = useStore((s) => s.students)
   const currentUser = useStore((s) => s.currentUser)
   const participateToEvent = useStore((s) => s.participateToEvent)
   const leaveEvent = useStore((s) => s.leaveEvent)
@@ -30,7 +31,7 @@ export default function EventDetailPage() {
   }
 
   const campus = mockCampuses.find((c) => c.id === event.campusId)
-  const creator = mockStudents.find((s) => s.id === event.creatorId)
+  const creator = students.find((s) => s.id === event.creatorId)
   const date = new Date(event.date)
   const dateStr = date.toLocaleDateString('fr-FR', {
     weekday: 'long',
@@ -88,22 +89,33 @@ export default function EventDetailPage() {
 
       <p style={{ margin: '1rem 0', lineHeight: 1.5 }}>{event.description}</p>
 
-      <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-        Créé par{' '}
-        <Link to={`/profile/${event.creatorId}`}>
-          {creator?.name ?? 'Inconnu'}
-        </Link>
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0', fontSize: '0.875rem', color: '#6b7280' }}>
+        {creator?.avatarUrl ? (
+          <img src={creator.avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
+        ) : (
+          <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#667eea', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>
+            {creator?.name?.charAt(0) ?? '?'}
+          </div>
+        )}
+        <span>Créé par <Link to={`/profile/${event.creatorId}`}>{creator?.name ?? 'Inconnu'}</Link></span>
+      </div>
 
       <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
         {event.participantIds.length} participant(s)
       </p>
 
-      <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem', fontSize: '0.875rem' }}>
+      <ul style={{ margin: '0.5rem 0 0', paddingLeft: 0, fontSize: '0.875rem', listStyle: 'none' }}>
         {event.participantIds.map((id) => {
-          const participant = mockStudents.find((s) => s.id === id)
+          const participant = students.find((s) => s.id === id)
           return (
-            <li key={id}>
+            <li key={id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              {participant?.avatarUrl ? (
+                <img src={participant.avatarUrl} alt="" style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#667eea', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 600 }}>
+                  {participant?.name?.charAt(0) ?? '?'}
+                </div>
+              )}
               <Link to={`/profile/${id}`}>{participant?.name ?? id}</Link>
             </li>
           )

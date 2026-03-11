@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { mockStudents, mockCampuses } from '../data/mockData'
+import { mockCampuses } from '../data/mockData'
 import type { Student } from '../types'
 
 export default function AuthPage() {
@@ -13,12 +13,14 @@ export default function AuthPage() {
   const [error, setError] = useState('')
 
   const setCurrentUser = useStore((s) => s.setCurrentUser)
+  const students = useStore((s) => s.students)
+  const addStudent = useStore((s) => s.addStudent)
   const navigate = useNavigate()
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    const student = mockStudents.find((s) => s.email === email)
+    const student = students.find((s) => s.email === email)
     if (!student) {
       setError('Utilisateur non trouvé. Utilisez alice@campus.fr, bob@campus.fr, etc.')
       return
@@ -40,7 +42,7 @@ export default function AuthPage() {
       name: name.trim(),
       campusId: campusId || mockCampuses[0].id,
     }
-    mockStudents.push(newStudent)
+    addStudent(newStudent)
     setCurrentUser(newStudent)
     navigate('/')
   }
