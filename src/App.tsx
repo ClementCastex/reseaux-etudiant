@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage'
 import FeedPage from './pages/FeedPage'
 import ProfilePage from './pages/ProfilePage'
 import EventDetailPage from './pages/EventDetailPage'
+import MyEventsPage from './pages/MyEventsPage'
 import MessagesPlaceholder from './pages/MessagesPlaceholder'
 import NotificationsPlaceholder from './pages/NotificationsPlaceholder'
 
@@ -71,6 +72,7 @@ export default function App() {
         }
       >
         <Route index element={<FeedPage />} />
+        <Route path="my-events" element={<MyEventsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="profile/:studentId" element={<ProfilePage />} />
         <Route path="event/:eventId" element={<EventDetailPage />} />

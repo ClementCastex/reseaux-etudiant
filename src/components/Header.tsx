@@ -28,7 +28,7 @@ export default function Header() {
         <Link to="/" style={{ fontWeight: 600, color: '#333' }}>
           Fil d'actualité
         </Link>
-        <Link to="/profile">Mon profil</Link>
+        <Link to="/my-events">Mes événements</Link>
       </nav>
 
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>

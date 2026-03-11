@@ -26,7 +26,9 @@ export interface Event {
   id: string
   title: string
   description: string
-  date: string
+  imageUrl?: string | null
+  startDate: string
+  endDate: string
   campusId: string
   type: EventType
   creatorId: string

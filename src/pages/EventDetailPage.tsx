@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -18,8 +18,11 @@ export default function EventDetailPage() {
   const campuses = useStore((s) => s.campuses)
   const participateToEvent = useStore((s) => s.participateToEvent)
   const leaveEvent = useStore((s) => s.leaveEvent)
+  const deleteEvent = useStore((s) => s.deleteEvent)
   const isParticipating = useStore((s) => s.isParticipating)
   const [loading, setLoading] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+  const navigate = useNavigate()
 
   const event = events.find((e) => e.id === eventId)
 
@@ -34,8 +37,9 @@ export default function EventDetailPage() {
 
   const campus = campuses.find((c) => c.id === event.campusId)
   const creator = students.find((s) => s.id === event.creatorId)
-  const date = new Date(event.date)
-  const dateStr = date.toLocaleDateString('fr-FR', {
+  const start = new Date(event.startDate)
+  const end = new Date(event.endDate)
+  const startStr = start.toLocaleDateString('fr-FR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -43,6 +47,10 @@ export default function EventDetailPage() {
     hour: '2-digit',
     minute: '2-digit',
   })
+  const endStr = end.toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  const sevenDaysFromNow = new Date()
+  sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
+  const canDelete = currentUser?.id === event.creatorId && start > sevenDaysFromNow
 
   const participating = currentUser ? isParticipating(event.id, currentUser.id) : false
 
@@ -68,6 +76,21 @@ export default function EventDetailPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!currentUser || !canDelete) return
+    if (!confirm('Supprimer définitivement cet événement ?')) return
+    setLoading(true)
+    setDeleteError('')
+    try {
+      await deleteEvent(event.id, currentUser.id)
+      navigate('/')
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Erreur')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div
       style={{
@@ -80,6 +103,14 @@ export default function EventDetailPage() {
       <Link to="/" style={{ fontSize: '0.875rem', marginBottom: '1rem', display: 'inline-block' }}>
         ← Retour au fil
       </Link>
+
+      {event.imageUrl && (
+        <img
+          src={event.imageUrl}
+          alt=""
+          style={{ width: '100%', maxHeight: 280, objectFit: 'cover', borderRadius: 8, marginBottom: '1rem' }}
+        />
+      )}
 
       <span
         style={{
@@ -96,7 +127,7 @@ export default function EventDetailPage() {
       <h1 style={{ margin: '0.75rem 0', fontSize: '1.5rem' }}>{event.title}</h1>
 
       <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>
-        {campus?.name} · {dateStr}
+        {campus?.name} · {startStr} → {endStr}
       </p>
 
       <p style={{ margin: '1rem 0', lineHeight: 1.5 }}>{event.description}</p>
@@ -135,10 +166,11 @@ export default function EventDetailPage() {
       </ul>
 
       {currentUser && (
-        <div style={{ marginTop: '1.5rem' }}>
+        <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
           {participating ? (
             <button
               onClick={handleLeave}
+              disabled={loading}
               style={{
                 padding: '0.5rem 1rem',
                 background: '#f3f4f6',
@@ -151,6 +183,7 @@ export default function EventDetailPage() {
           ) : (
             <button
               onClick={handleParticipate}
+              disabled={loading}
               style={{
                 padding: '0.5rem 1rem',
                 background: '#2563eb',
@@ -161,6 +194,29 @@ export default function EventDetailPage() {
             >
               Participer
             </button>
+          )}
+          {currentUser.id === event.creatorId && (
+            <button
+              onClick={handleDelete}
+              disabled={!canDelete || loading}
+              title={!canDelete ? 'Suppression possible uniquement plus de 7 jours avant le début' : ''}
+              style={{
+                padding: '0.5rem 1rem',
+                background: canDelete ? '#dc2626' : '#e5e7eb',
+                color: canDelete ? '#fff' : '#9ca3af',
+                border: 'none',
+                borderRadius: 4,
+                cursor: canDelete ? 'pointer' : 'not-allowed',
+              }}
+            >
+              Supprimer l&apos;événement
+            </button>
+          )}
+          {deleteError && <span style={{ color: '#dc2626', fontSize: '0.875rem' }}>{deleteError}</span>}
+          {currentUser.id === event.creatorId && !canDelete && start <= sevenDaysFromNow && (
+            <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
+              Suppression possible uniquement plus de 7 jours avant le début
+            </span>
           )}
         </div>
       )}
