@@ -17,14 +17,16 @@ interface EventCardProps {
 export default function EventCard({ event }: EventCardProps) {
   const campuses = useStore((s) => s.campuses)
   const campus = campuses.find((c) => c.id === event.campusId)
-  const date = new Date(event.date)
-  const dateStr = date.toLocaleDateString('fr-FR', {
+  const start = new Date(event.startDate)
+  const end = new Date(event.endDate)
+  const startStr = start.toLocaleDateString('fr-FR', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
   })
+  const endStr = end.toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 
   return (
     <div
@@ -32,12 +34,20 @@ export default function EventCard({ event }: EventCardProps) {
         background: '#fff',
         border: '1px solid #e5e7eb',
         borderRadius: 8,
-        padding: '1rem 1.25rem',
+        overflow: 'hidden',
         marginBottom: '1rem',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-        <div>
+      {event.imageUrl && (
+        <img
+          src={event.imageUrl}
+          alt=""
+          style={{ width: '100%', height: 140, objectFit: 'cover' }}
+        />
+      )}
+      <div style={{ padding: '1rem 1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+          <div style={{ flex: 1 }}>
           <span
             style={{
               fontSize: '0.75rem',
@@ -51,14 +61,14 @@ export default function EventCard({ event }: EventCardProps) {
           </span>
           <h3 style={{ margin: '0.5rem 0', fontSize: '1.1rem' }}>{event.title}</h3>
           <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-            {campus?.name} · {dateStr}
+            {campus?.name} · {startStr} → {endStr}
           </p>
           <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem' }}>{event.description}</p>
           <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: '#9ca3af' }}>
             {event.participantIds.length} participant(s)
           </p>
-        </div>
-        <Link
+          </div>
+          <Link
           to={`/event/${event.id}`}
           style={{
             padding: '0.5rem 1rem',
@@ -68,9 +78,10 @@ export default function EventCard({ event }: EventCardProps) {
             fontSize: '0.875rem',
             whiteSpace: 'nowrap',
           }}
-        >
-          Voir le détail
-        </Link>
+          >
+            Voir le détail
+          </Link>
+        </div>
       </div>
     </div>
   )

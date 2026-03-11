@@ -28,7 +28,9 @@ function formatEvent(e: {
   id: string
   title: string
   description: string
-  date: Date
+  imageUrl?: string | null
+  startDate: Date
+  endDate: Date
   campusId: string
   type: string
   creatorId: string
@@ -41,7 +43,9 @@ function formatEvent(e: {
     id: e.id,
     title: e.title,
     description: e.description,
-    date: e.date.toISOString(),
+    imageUrl: e.imageUrl ?? null,
+    startDate: e.startDate.toISOString(),
+    endDate: e.endDate.toISOString(),
     campusId: e.campusId,
     type: e.type,
     creatorId: e.creatorId,
@@ -187,16 +191,18 @@ app.get('/api/events/:id', async (req, res) => {
 
 app.post('/api/events', async (req, res) => {
   try {
-    const { title, description, date, campusId, type, creatorId, participantIds } = req.body
-    if (!title || !date || !campusId || !type || !creatorId) {
-      return res.status(400).json({ error: 'title, date, campusId, type, creatorId requis' })
+    const { title, description, imageUrl, startDate, endDate, campusId, type, creatorId, participantIds } = req.body
+    if (!title || !startDate || !endDate || !campusId || !type || !creatorId) {
+      return res.status(400).json({ error: 'title, startDate, endDate, campusId, type, creatorId requis' })
     }
     const participantIdsArray = Array.isArray(participantIds) ? participantIds : [creatorId]
     const event = await prisma.event.create({
       data: {
         title,
         description: description ?? '',
-        date: new Date(date),
+        imageUrl: imageUrl ?? null,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
         campusId,
         type,
         creatorId,
@@ -251,6 +257,37 @@ app.post('/api/events/:id/leave', async (req, res) => {
       },
     })
     res.json(formatEvent(event))
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+app.delete('/api/events/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { creatorId } = req.body
+    if (!creatorId) return res.status(400).json({ error: 'creatorId requis' })
+
+    const event = await prisma.event.findUnique({
+      where: { id },
+      select: { creatorId: true, startDate: true },
+    })
+    if (!event) return res.status(404).json({ error: 'Événement non trouvé' })
+    if (event.creatorId !== creatorId) {
+      return res.status(403).json({ error: 'Seul le créateur peut supprimer cet événement' })
+    }
+
+    const sevenDaysFromNow = new Date()
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
+    if (event.startDate < sevenDaysFromNow) {
+      return res.status(403).json({
+        error: 'Suppression impossible : moins de 7 jours avant le début de l\'événement',
+      })
+    }
+
+    await prisma.event.delete({ where: { id } })
+    res.status(204).send()
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Erreur serveur' })

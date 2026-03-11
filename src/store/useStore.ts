@@ -14,6 +14,7 @@ interface AppState {
   updateStudent: (studentId: string, data: Partial<Student>) => Promise<void>
   addStudent: (student: Student) => Promise<void>
   addEvent: (event: Omit<Event, 'id' | 'createdAt'>) => Promise<void>
+  deleteEvent: (eventId: string, creatorId: string) => Promise<void>
   participateToEvent: (eventId: string, studentId: string) => Promise<void>
   leaveEvent: (eventId: string, studentId: string) => Promise<void>
   isParticipating: (eventId: string, studentId: string) => boolean
@@ -81,7 +82,9 @@ export const useStore = create<AppState>((set, get) => ({
       const created = await api.events.create({
         title: event.title,
         description: event.description,
-        date: event.date,
+        imageUrl: event.imageUrl,
+        startDate: event.startDate,
+        endDate: event.endDate,
         campusId: event.campusId,
         type: event.type,
         creatorId: event.creatorId,
@@ -91,6 +94,11 @@ export const useStore = create<AppState>((set, get) => ({
     } catch (err) {
       throw err
     }
+  },
+
+  deleteEvent: async (eventId, creatorId) => {
+    await api.events.delete(eventId, creatorId)
+    set((state) => ({ events: state.events.filter((e) => e.id !== eventId) }))
   },
 
   participateToEvent: async (eventId, studentId) => {

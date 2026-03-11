@@ -14,6 +14,7 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const err = await res.json().catch(() => ({ error: res.statusText }))
     throw new Error(err.error ?? res.statusText)
   }
+  if (res.status === 204) return undefined as T
   return res.json()
 }
 
@@ -34,11 +35,22 @@ export const api = {
   events: {
     list: () => fetchApi<Event[]>(`/events`),
     get: (id: string) => fetchApi<Event>(`/events/${id}`),
-    create: (data: { title: string; description?: string; date: string; campusId: string; type: EventType; creatorId: string; participantIds?: string[] }) =>
-      fetchApi<Event>(`/events`, { method: 'POST', body: JSON.stringify(data) }),
+    create: (data: {
+      title: string
+      description?: string
+      imageUrl?: string | null
+      startDate: string
+      endDate: string
+      campusId: string
+      type: EventType
+      creatorId: string
+      participantIds?: string[]
+    }) => fetchApi<Event>(`/events`, { method: 'POST', body: JSON.stringify(data) }),
     participate: (eventId: string, studentId: string) =>
       fetchApi<Event>(`/events/${eventId}/participate`, { method: 'POST', body: JSON.stringify({ studentId }) }),
     leave: (eventId: string, studentId: string) =>
       fetchApi<Event>(`/events/${eventId}/leave`, { method: 'POST', body: JSON.stringify({ studentId }) }),
+    delete: (eventId: string, creatorId: string) =>
+      fetchApi<void>(`/events/${eventId}`, { method: 'DELETE', body: JSON.stringify({ creatorId }) }),
   },
 }

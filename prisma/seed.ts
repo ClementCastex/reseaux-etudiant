@@ -77,7 +77,8 @@ async function main() {
     data: {
       title: 'Soirée de rentrée',
       description: 'Venez fêter la rentrée tous ensemble !',
-      date: new Date('2025-03-15T19:00:00'),
+      startDate: new Date('2025-03-15T19:00:00'),
+      endDate: new Date('2025-03-15T23:00:00'),
       campusId: c1.id,
       type: 'soiree',
       creatorId: alice.id,
@@ -91,7 +92,8 @@ async function main() {
     data: {
       title: 'Session sport 5-a-side',
       description: 'Match de foot entre campus.',
-      date: new Date('2025-03-18T14:00:00'),
+      startDate: new Date('2025-03-18T14:00:00'),
+      endDate: new Date('2025-03-18T16:00:00'),
       campusId: c1.id,
       type: 'sport',
       creatorId: bob.id,
@@ -105,7 +107,8 @@ async function main() {
     data: {
       title: 'Groupe de révision examen',
       description: 'Révision collective pour les partiels.',
-      date: new Date('2025-03-20T09:00:00'),
+      startDate: new Date('2025-03-20T09:00:00'),
+      endDate: new Date('2025-03-20T12:00:00'),
       campusId: c2.id,
       type: 'etude',
       creatorId: clara.id,

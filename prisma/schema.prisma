@@ -42,7 +42,9 @@ model Event {
   id           String    @id @default(cuid())
   title        String
   description  String
-  date         DateTime
+  imageUrl     String?
+  startDate    DateTime
+  endDate      DateTime
   campusId     String
   campus       Campus    @relation(fields: [campusId], references: [id], onDelete: Cascade)
   type         String     // soiree | sport | etude | culture | autre
@@ -55,6 +57,6 @@ model Event {
 
   @@index([campusId])
   @@index([creatorId])
-  @@index([date])
+  @@index([startDate])
   @@map("events")
 }

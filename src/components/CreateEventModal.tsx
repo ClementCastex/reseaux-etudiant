@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { EventType } from '../types'
 import { useStore } from '../store/useStore'
 
@@ -21,22 +21,39 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [campusId, setCampusId] = useState(currentUser?.campusId ?? campuses[0]?.id ?? '')
   const [type, setType] = useState<EventType>('soiree')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = () => setImageUrl(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!currentUser || !title.trim() || !date) return
+    if (!currentUser || !title.trim() || !startDate || !endDate) return
+    if (new Date(endDate) <= new Date(startDate)) {
+      setError('L\'heure de fin doit être après l\'heure de début')
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
       await addEvent({
         title: title.trim(),
         description: description.trim(),
-        date,
+        imageUrl: imageUrl ?? undefined,
+        startDate,
+        endDate,
         campusId,
         type,
         creatorId: currentUser.id,
@@ -115,12 +132,60 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
 
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
-              Date et heure
+              Image de l&apos;événement
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              {imageUrl ? (
+                <>
+                  <img src={imageUrl} alt="Aperçu" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 4 }} />
+                  <button type="button" onClick={() => fileInputRef.current?.click()} style={{ padding: '0.35rem 0.75rem', fontSize: '0.875rem' }}>
+                    Changer
+                  </button>
+                  <button type="button" onClick={() => setImageUrl(null)} style={{ padding: '0.35rem 0.75rem', fontSize: '0.875rem', background: '#fef2f2', color: '#dc2626' }}>
+                    Supprimer
+                  </button>
+                </>
+              ) : (
+                <button type="button" onClick={() => fileInputRef.current?.click()} style={{ padding: '0.5rem 1rem', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 4 }}>
+                  Ajouter une image
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
+              Début
             </label>
             <input
               type="datetime-local"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                border: '1px solid #d1d5db',
+                borderRadius: 4,
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
+              Fin
+            </label>
+            <input
+              type="datetime-local"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
               required
               style={{
                 width: '100%',
