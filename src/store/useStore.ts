@@ -8,9 +8,11 @@ interface AppState {
   students: Student[]
   campuses: Campus[]
   friendIds: string[]
+  eventSearchQuery: string
   isLoading: boolean
   error: string | null
   setCurrentUser: (user: Student | null) => void
+  setEventSearchQuery: (q: string) => void
   loadFromApi: () => Promise<void>
   loadFriendships: () => Promise<void>
   addFriend: (friendId: string) => Promise<void>
@@ -30,10 +32,12 @@ export const useStore = create<AppState>((set, get) => ({
   students: [],
   campuses: [],
   friendIds: [],
+  eventSearchQuery: '',
   isLoading: true,
   error: null,
 
   setCurrentUser: (user) => set({ currentUser: user }),
+  setEventSearchQuery: (q) => set({ eventSearchQuery: q }),
 
   loadFriendships: async () => {
     const currentUser = get().currentUser
