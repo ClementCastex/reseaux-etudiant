@@ -18,11 +18,195 @@ function getConversationLabel(conv: Conversation, currentUserId: string) {
   return other?.name ?? 'Conversation'
 }
 
+function CreateGroupModal({
+  onClose,
+  onCreate,
+  currentUserId,
+  students,
+  friendIds,
+}: {
+  onClose: () => void
+  onCreate: (conv: Conversation) => void
+  currentUserId: string
+  students: { id: string; name: string }[]
+  friendIds: string[]
+}) {
+  const [name, setName] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const candidates = students
+    .filter((s) => s.id !== currentUserId)
+    .sort((a, b) => {
+      const aFriend = friendIds.includes(a.id)
+      const bFriend = friendIds.includes(b.id)
+      if (aFriend && !bFriend) return -1
+      if (!aFriend && bFriend) return 1
+      return a.name.localeCompare(b.name)
+    })
+
+  const toggle = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleSubmit = async () => {
+    const trimmed = name.trim()
+    if (!trimmed) {
+      setError('Indiquez un nom pour le groupe.')
+      return
+    }
+    if (selectedIds.size < 1) {
+      setError('Sélectionnez au moins un participant.')
+      return
+    }
+    setError('')
+    setLoading(true)
+    try {
+      const participantIds = [currentUserId, ...selectedIds]
+      const conv = await api.conversations.create(participantIds, true, trimmed)
+      onCreate(conv)
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.4)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 12,
+          padding: '1.5rem',
+          maxWidth: 420,
+          width: '90%',
+          maxHeight: '80vh',
+          overflowY: 'auto',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Créer un groupe</h3>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+          Nom du groupe
+        </label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Ex: Groupe projet X"
+          style={{
+            width: '100%',
+            padding: '0.5rem 0.75rem',
+            border: '1px solid #d1d5db',
+            borderRadius: 8,
+            marginBottom: '1rem',
+            fontSize: '0.9rem',
+            boxSizing: 'border-box',
+          }}
+        />
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+          Participants
+        </label>
+        <div
+          style={{
+            maxHeight: 200,
+            overflowY: 'auto',
+            border: '1px solid #e5e7eb',
+            borderRadius: 8,
+            padding: '0.5rem',
+            marginBottom: '1rem',
+          }}
+        >
+          {candidates.map((s) => (
+            <label
+              key={s.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.4rem',
+                cursor: 'pointer',
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={selectedIds.has(s.id)}
+                onChange={() => toggle(s.id)}
+              />
+              <span style={{ fontSize: '0.9rem' }}>{s.name}</span>
+              {friendIds.includes(s.id) && (
+                <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>• ami</span>
+              )}
+            </label>
+          ))}
+        </div>
+        {error && (
+          <p style={{ margin: '0 0 0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>{error}</p>
+        )}
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: '0.5rem 1rem',
+              background: '#f3f4f6',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+            }}
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading || selectedIds.size < 1 || !name.trim()}
+            style={{
+              padding: '0.5rem 1rem',
+              background: '#2563eb',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              cursor: loading ? 'wait' : 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: 500,
+            }}
+          >
+            {loading ? 'Création...' : 'Créer le groupe'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function MessagesPage() {
   const [searchParams] = useSearchParams()
   const newWithStudentId = searchParams.get('new')
   const currentUser = useStore((s) => s.currentUser)
   const students = useStore((s) => s.students)
+  const friendIds = useStore((s) => s.friendIds)
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -31,6 +215,7 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false)
   const [newMessage, setNewMessage] = useState('')
   const [creatingNew, setCreatingNew] = useState(false)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -46,7 +231,7 @@ export default function MessagesPage() {
         setConversations(list)
         if (newWithStudentId) {
           const existing = list.find((c) =>
-            c.participants.some((p) => p.id === newWithStudentId)
+            !c.isGroup && c.participants.some((p) => p.id === newWithStudentId)
           )
           if (existing) {
             setSelectedId(existing.id)
@@ -69,10 +254,7 @@ export default function MessagesPage() {
     if (creatingNew && newWithStudentId && currentUser) {
       const createAndOpen = async () => {
         try {
-          const conv = await api.conversations.create(
-            [currentUser.id, newWithStudentId],
-            false
-          )
+          const conv = await api.conversations.create([currentUser.id, newWithStudentId], false)
           setConversations((prev) => [...prev, conv])
           setSelectedId(conv.id)
           window.history.replaceState({}, '', '/messages')
@@ -104,7 +286,14 @@ export default function MessagesPage() {
   }, [messages])
 
   const selectedConv = conversations.find((c) => c.id === selectedId)
-  const otherParticipant = selectedConv?.participants.find((p) => p.id !== currentUser?.id)
+  const otherParticipant = selectedConv && !selectedConv.isGroup
+    ? selectedConv.participants.find((p) => p.id !== currentUser?.id)
+    : null
+
+  const handleCreateGroup = (conv: Conversation) => {
+    setConversations((prev) => [...prev, conv])
+    setSelectedId(conv.id)
+  }
 
   const handleSend = async () => {
     if (!currentUser || !selectedId || !newMessage.trim()) return
@@ -159,10 +348,30 @@ export default function MessagesPage() {
           borderRight: '1px solid #e5e7eb',
           overflowY: 'auto',
           flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <div style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Messages</h2>
+        <div style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb', flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Messages</h2>
+            <button
+              type="button"
+              onClick={() => setShowCreateGroup(true)}
+              style={{
+                padding: '0.4rem 0.75rem',
+                fontSize: '0.8rem',
+                background: '#2563eb',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 6,
+                cursor: 'pointer',
+                fontWeight: 500,
+              }}
+            >
+              Créer un groupe
+            </button>
+          </div>
         </div>
         {loading ? (
           <p style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
@@ -170,7 +379,8 @@ export default function MessagesPage() {
           </p>
         ) : conversations.length === 0 && !creatingNew ? (
           <p style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-            Aucune conversation. Allez sur un profil et cliquez sur &quot;Envoyer un message&quot;.
+            Aucune conversation. Utilisez &quot;Créer un groupe&quot; ou cliquez sur
+            &quot;Envoyer un message&quot; sur un profil.
           </p>
         ) : (
           conversations.map((conv) => {
@@ -199,7 +409,9 @@ export default function MessagesPage() {
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: conv.isGroup
+                      ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: '#fff',
                     display: 'flex',
                     alignItems: 'center',
@@ -209,7 +421,7 @@ export default function MessagesPage() {
                     flexShrink: 0,
                   }}
                 >
-                  {label.charAt(0).toUpperCase()}
+                  {conv.isGroup ? '👥' : label.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ margin: 0, fontWeight: 500, fontSize: '0.9rem' }}>{label}</p>
@@ -262,6 +474,9 @@ export default function MessagesPage() {
               <span style={{ fontWeight: 500 }}>
                 {getConversationLabel(selectedConv, currentUser.id)}
               </span>
+              {selectedConv.isGroup && (
+                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>(groupe)</span>
+              )}
               {otherParticipant && (
                 <Link
                   to={`/profile/${otherParticipant.id}`}
@@ -374,10 +589,20 @@ export default function MessagesPage() {
           >
             {creatingNew
               ? 'Ouverture de la conversation...'
-              : 'Sélectionnez une conversation ou envoyez un message depuis un profil.'}
+              : 'Sélectionnez une conversation, créez un groupe ou envoyez un message depuis un profil.'}
           </div>
         )}
       </div>
+
+      {showCreateGroup && (
+        <CreateGroupModal
+          onClose={() => setShowCreateGroup(false)}
+          onCreate={handleCreateGroup}
+          currentUserId={currentUser.id}
+          students={students}
+          friendIds={friendIds}
+        />
+      )}
     </div>
   )
 }
