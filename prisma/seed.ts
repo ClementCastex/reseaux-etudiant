@@ -73,52 +73,71 @@ async function main() {
     update: {},
   })
 
-  await prisma.event.create({
-    data: {
-      title: 'Soirée de rentrée',
-      description: 'Venez fêter la rentrée tous ensemble !',
-      startDate: new Date('2025-03-15T19:00:00'),
-      endDate: new Date('2025-03-15T23:00:00'),
-      campusId: c1.id,
-      type: 'soiree',
-      creatorId: alice.id,
-      participants: {
-        connect: [{ id: alice.id }, { id: bob.id }],
+  // Événements : seulement si la table est vide
+  const eventCount = await prisma.event.count()
+  if (eventCount === 0) {
+    await prisma.event.create({
+      data: {
+        title: 'Soirée de rentrée',
+        description: 'Venez fêter la rentrée tous ensemble !',
+        startDate: new Date('2025-03-15T19:00:00'),
+        endDate: new Date('2025-03-15T23:00:00'),
+        campusId: c1.id,
+        type: 'soiree',
+        creatorId: alice.id,
+        participants: {
+          connect: [{ id: alice.id }, { id: bob.id }],
+        },
       },
-    },
-  })
-
-  await prisma.event.create({
-    data: {
-      title: 'Session sport 5-a-side',
-      description: 'Match de foot entre campus.',
-      startDate: new Date('2025-03-18T14:00:00'),
-      endDate: new Date('2025-03-18T16:00:00'),
-      campusId: c1.id,
-      type: 'sport',
-      creatorId: bob.id,
-      participants: {
-        connect: [{ id: bob.id }, { id: clara.id }],
+    })
+    await prisma.event.create({
+      data: {
+        title: 'Session sport 5-a-side',
+        description: 'Match de foot entre campus.',
+        startDate: new Date('2025-03-18T14:00:00'),
+        endDate: new Date('2025-03-18T16:00:00'),
+        campusId: c1.id,
+        type: 'sport',
+        creatorId: bob.id,
+        participants: {
+          connect: [{ id: bob.id }, { id: clara.id }],
+        },
       },
-    },
-  })
-
-  await prisma.event.create({
-    data: {
-      title: 'Groupe de révision examen',
-      description: 'Révision collective pour les partiels.',
-      startDate: new Date('2025-03-20T09:00:00'),
-      endDate: new Date('2025-03-20T12:00:00'),
-      campusId: c2.id,
-      type: 'etude',
-      creatorId: clara.id,
-      participants: {
-        connect: [{ id: clara.id }],
+    })
+    await prisma.event.create({
+      data: {
+        title: 'Groupe de révision examen',
+        description: 'Révision collective pour les partiels.',
+        startDate: new Date('2025-03-20T09:00:00'),
+        endDate: new Date('2025-03-20T12:00:00'),
+        campusId: c2.id,
+        type: 'etude',
+        creatorId: clara.id,
+        participants: {
+          connect: [{ id: clara.id }],
+        },
       },
-    },
-  })
+    })
+  }
 
-  console.log('Seed terminé : campuses, étudiants, événements créés.')
+  // Amitiés : Alice-Bob, Alice-Clara, Bob-Clara (skipDuplicates évite les doublons)
+  try {
+    await prisma.friendship.createMany({
+      data: [
+        { studentId: alice.id, friendId: bob.id },
+        { studentId: bob.id, friendId: alice.id },
+        { studentId: alice.id, friendId: clara.id },
+        { studentId: clara.id, friendId: alice.id },
+        { studentId: bob.id, friendId: clara.id },
+        { studentId: clara.id, friendId: bob.id },
+      ],
+      skipDuplicates: true,
+    })
+  } catch {
+    // Table friendships peut ne pas exister si schema pas encore synchronisé
+  }
+
+  console.log('Seed terminé : campuses, étudiants, événements, amitiés.')
 }
 
 main()

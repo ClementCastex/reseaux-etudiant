@@ -7,10 +7,14 @@ interface AppState {
   events: Event[]
   students: Student[]
   campuses: Campus[]
+  friendIds: string[]
   isLoading: boolean
   error: string | null
   setCurrentUser: (user: Student | null) => void
   loadFromApi: () => Promise<void>
+  loadFriendships: () => Promise<void>
+  addFriend: (friendId: string) => Promise<void>
+  removeFriend: (friendId: string) => Promise<void>
   updateStudent: (studentId: string, data: Partial<Student>) => Promise<void>
   addStudent: (student: Student) => Promise<void>
   addEvent: (event: Omit<Event, 'id' | 'createdAt'>) => Promise<void>
@@ -25,10 +29,38 @@ export const useStore = create<AppState>((set, get) => ({
   events: [],
   students: [],
   campuses: [],
+  friendIds: [],
   isLoading: true,
   error: null,
 
   setCurrentUser: (user) => set({ currentUser: user }),
+
+  loadFriendships: async () => {
+    const currentUser = get().currentUser
+    if (!currentUser) return
+    try {
+      const friends = await api.friendships.list(currentUser.id)
+      set({ friendIds: friends.map((f) => f.id) })
+    } catch {
+      set({ friendIds: [] })
+    }
+  },
+
+  addFriend: async (friendId) => {
+    const currentUser = get().currentUser
+    if (!currentUser) return
+    await api.friendships.add(currentUser.id, friendId)
+    set((state) => ({
+      friendIds: state.friendIds.includes(friendId) ? state.friendIds : [...state.friendIds, friendId],
+    }))
+  },
+
+  removeFriend: async (friendId) => {
+    const currentUser = get().currentUser
+    if (!currentUser) return
+    await api.friendships.remove(currentUser.id, friendId)
+    set((state) => ({ friendIds: state.friendIds.filter((id) => id !== friendId) }))
+  },
 
   loadFromApi: async () => {
     set({ isLoading: true, error: null })
