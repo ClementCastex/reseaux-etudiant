@@ -14,7 +14,9 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 
 export default function ProfilePage() {
   const { studentId } = useParams()
+  const navigate = useNavigate()
   const currentUser = useStore((s) => s.currentUser)
+  const setCurrentUser = useStore((s) => s.setCurrentUser)
   const students = useStore((s) => s.students)
 
   const campuses = useStore((s) => s.campuses)
@@ -45,37 +47,22 @@ export default function ProfilePage() {
         boxShadow: 'var(--shadow-sm)',
       }}
     >
-<<<<<<< HEAD
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span
-          style={{
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            background: 'var(--color-primary-light)',
-            color: 'var(--color-primary-hover)',
-            padding: '4px 10px',
-            borderRadius: 'var(--radius-sm)',
-          }}
-        >
-          {campus?.name ?? 'Campus'}
-        </span>
-=======
       <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span
             style={{
               fontSize: '0.75rem',
-              background: '#e0e7ff',
-              color: '#4338ca',
+              fontWeight: 600,
+              background: 'var(--color-primary-light)',
+              color: 'var(--color-primary-hover)',
               padding: '4px 10px',
-              borderRadius: 4,
+              borderRadius: 'var(--radius-sm)',
             }}
           >
             {campus?.name ?? 'Campus'}
           </span>
           {student.formation && <FormationBadge formation={student.formation} />}
         </div>
->>>>>>> b6a11f0eecb6a11df19f2b68ac0211110c98a855
         {isOwnProfile && (
           <button
             onClick={() => setShowEditModal(true)}
@@ -185,17 +172,38 @@ export default function ProfilePage() {
         <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
           <Link
             to={`/messages?new=${student.id}`}
+            className="btn-primary"
             style={{
+              display: 'inline-block',
               padding: '0.5rem 1rem',
-              background: '#2563eb',
-              color: '#fff',
-              borderRadius: 4,
-              fontSize: '0.875rem',
               textDecoration: 'none',
+              fontSize: '0.875rem',
             }}
           >
             Envoyer un message
           </Link>
+        </div>
+      )}
+
+      {isOwnProfile && (
+        <div style={{ marginTop: '1.5rem' }}>
+          <button
+            type="button"
+            onClick={() => {
+              setCurrentUser(null)
+              navigate('/auth')
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-subtle)',
+              fontSize: '0.875rem',
+              padding: 0,
+              cursor: 'pointer',
+            }}
+          >
+            Déconnexion
+          </button>
         </div>
       )}
 

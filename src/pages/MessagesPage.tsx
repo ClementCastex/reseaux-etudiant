@@ -94,19 +94,20 @@ function CreateGroupModal({
     >
       <div
         style={{
-          background: '#fff',
-          borderRadius: 12,
+          background: 'var(--color-surface)',
+          borderRadius: 'var(--radius-md)',
           padding: '1.5rem',
           maxWidth: 420,
           width: '90%',
           maxHeight: '80vh',
           overflowY: 'auto',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--color-border-muted)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem' }}>Créer un groupe</h3>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+        <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem', color: 'var(--color-text)' }}>Créer un groupe</h3>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
           Nom du groupe
         </label>
         <input
@@ -114,25 +115,18 @@ function CreateGroupModal({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ex: Groupe projet X"
-          style={{
-            width: '100%',
-            padding: '0.5rem 0.75rem',
-            border: '1px solid #d1d5db',
-            borderRadius: 8,
-            marginBottom: '1rem',
-            fontSize: '0.9rem',
-            boxSizing: 'border-box',
-          }}
+          className="input-base"
+          style={{ width: '100%', marginBottom: '1rem', boxSizing: 'border-box' }}
         />
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
           Participants
         </label>
         <div
           style={{
             maxHeight: 200,
             overflowY: 'auto',
-            border: '1px solid #e5e7eb',
-            borderRadius: 8,
+            border: '1px solid var(--color-border-muted)',
+            borderRadius: 'var(--radius-sm)',
             padding: '0.5rem',
             marginBottom: '1rem',
           }}
@@ -148,50 +142,26 @@ function CreateGroupModal({
                 cursor: 'pointer',
               }}
             >
-              <input
-                type="checkbox"
-                checked={selectedIds.has(s.id)}
-                onChange={() => toggle(s.id)}
-              />
-              <span style={{ fontSize: '0.9rem' }}>{s.name}</span>
+              <input type="checkbox" checked={selectedIds.has(s.id)} onChange={() => toggle(s.id)} />
+              <span style={{ fontSize: '0.9rem', color: 'var(--color-text)' }}>{s.name}</span>
               {friendIds.includes(s.id) && (
-                <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>• ami</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--color-text-subtle)' }}>• ami</span>
               )}
             </label>
           ))}
         </div>
         {error && (
-          <p style={{ margin: '0 0 0.75rem', color: '#dc2626', fontSize: '0.875rem' }}>{error}</p>
+          <p style={{ margin: '0 0 0.75rem', color: 'var(--color-error)', fontSize: '0.875rem' }}>{error}</p>
         )}
         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#f3f4f6',
-              border: 'none',
-              borderRadius: 8,
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >
+          <button type="button" onClick={onClose} className="btn-secondary">
             Annuler
           </button>
           <button
             type="button"
             onClick={handleSubmit}
             disabled={loading || selectedIds.size < 1 || !name.trim()}
-            style={{
-              padding: '0.5rem 1rem',
-              background: '#2563eb',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              cursor: loading ? 'wait' : 'pointer',
-              fontSize: '0.9rem',
-              fontWeight: 500,
-            }}
+            className="btn-primary"
           >
             {loading ? 'Création...' : 'Créer le groupe'}
           </button>
@@ -230,8 +200,8 @@ export default function MessagesPage() {
         const list = await api.conversations.list(currentUser.id)
         setConversations(list)
         if (newWithStudentId) {
-          const existing = list.find((c) =>
-            !c.isGroup && c.participants.some((p) => p.id === newWithStudentId)
+          const existing = list.find(
+            (c) => !c.isGroup && c.participants.some((p) => p.id === newWithStudentId)
           )
           if (existing) {
             setSelectedId(existing.id)
@@ -286,9 +256,10 @@ export default function MessagesPage() {
   }, [messages])
 
   const selectedConv = conversations.find((c) => c.id === selectedId)
-  const otherParticipant = selectedConv && !selectedConv.isGroup
-    ? selectedConv.participants.find((p) => p.id !== currentUser?.id)
-    : null
+  const otherParticipant =
+    selectedConv && !selectedConv.isGroup
+      ? selectedConv.participants.find((p) => p.id !== currentUser?.id)
+      : null
 
   const handleCreateGroup = (conv: Conversation) => {
     setConversations((prev) => [...prev, conv])
@@ -299,11 +270,7 @@ export default function MessagesPage() {
     if (!currentUser || !selectedId || !newMessage.trim()) return
     setSending(true)
     try {
-      const msg = await api.conversations.sendMessage(
-        selectedId,
-        currentUser.id,
-        newMessage.trim()
-      )
+      const msg = await api.conversations.sendMessage(selectedId, currentUser.id, newMessage.trim())
       setMessages((prev) => [...prev, msg])
       setNewMessage('')
       setConversations((prev) =>
@@ -335,50 +302,42 @@ export default function MessagesPage() {
         display: 'flex',
         height: 'calc(100vh - 180px)',
         minHeight: 400,
-        background: '#fff',
-        border: '1px solid #e5e7eb',
-        borderRadius: 8,
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border-muted)',
+        borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Liste des conversations */}
       <div
         style={{
           width: 280,
-          borderRight: '1px solid #e5e7eb',
+          borderRight: '1px solid var(--color-border-muted)',
           overflowY: 'auto',
           flexShrink: 0,
           display: 'flex',
           flexDirection: 'column',
         }}
       >
-        <div style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb', flexShrink: 0 }}>
+        <div style={{ padding: '1rem', borderBottom: '1px solid var(--color-border-muted)', flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Messages</h2>
+            <h2 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-text)' }}>Messages</h2>
             <button
               type="button"
               onClick={() => setShowCreateGroup(true)}
-              style={{
-                padding: '0.4rem 0.75rem',
-                fontSize: '0.8rem',
-                background: '#2563eb',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                cursor: 'pointer',
-                fontWeight: 500,
-              }}
+              className="btn-primary"
+              style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem' }}
             >
               Créer un groupe
             </button>
           </div>
         </div>
         {loading ? (
-          <p style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+          <p style={{ padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
             Chargement...
           </p>
         ) : conversations.length === 0 && !creatingNew ? (
-          <p style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+          <p style={{ padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
             Aucune conversation. Utilisez &quot;Créer un groupe&quot; ou cliquez sur
             &quot;Envoyer un message&quot; sur un profil.
           </p>
@@ -397,9 +356,9 @@ export default function MessagesPage() {
                   gap: '0.75rem',
                   width: '100%',
                   padding: '0.75rem 1rem',
-                  background: isSelected ? '#eff6ff' : 'transparent',
+                  background: isSelected ? 'var(--color-primary-light)' : 'transparent',
                   border: 'none',
-                  borderBottom: '1px solid #f3f4f6',
+                  borderBottom: '1px solid var(--color-border-muted)',
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
@@ -410,8 +369,8 @@ export default function MessagesPage() {
                     height: 40,
                     borderRadius: '50%',
                     background: conv.isGroup
-                      ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      ? 'linear-gradient(135deg, var(--color-success) 0%, #059669 100%)'
+                      : 'var(--color-primary)',
                     color: '#fff',
                     display: 'flex',
                     alignItems: 'center',
@@ -424,13 +383,15 @@ export default function MessagesPage() {
                   {conv.isGroup ? '👥' : label.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontWeight: 500, fontSize: '0.9rem' }}>{label}</p>
+                  <p style={{ margin: 0, fontWeight: 500, fontSize: '0.9rem', color: 'var(--color-text)' }}>
+                    {label}
+                  </p>
                   {conv.lastMessage && (
                     <p
                       style={{
                         margin: '0.2rem 0 0',
                         fontSize: '0.8rem',
-                        color: '#6b7280',
+                        color: 'var(--color-text-muted)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
@@ -445,13 +406,12 @@ export default function MessagesPage() {
           })
         )}
         {creatingNew && (
-          <p style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+          <p style={{ padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
             Création de la conversation...
           </p>
         )}
       </div>
 
-      {/* Zone de chat */}
       <div
         style={{
           flex: 1,
@@ -465,22 +425,22 @@ export default function MessagesPage() {
             <div
               style={{
                 padding: '0.75rem 1rem',
-                borderBottom: '1px solid #e5e7eb',
+                borderBottom: '1px solid var(--color-border-muted)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
               }}
             >
-              <span style={{ fontWeight: 500 }}>
+              <span style={{ fontWeight: 500, color: 'var(--color-text)' }}>
                 {getConversationLabel(selectedConv, currentUser.id)}
               </span>
               {selectedConv.isGroup && (
-                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>(groupe)</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-subtle)' }}>(groupe)</span>
               )}
               {otherParticipant && (
                 <Link
                   to={`/profile/${otherParticipant.id}`}
-                  style={{ fontSize: '0.8rem', color: '#2563eb' }}
+                  style={{ fontSize: '0.8rem', color: 'var(--color-primary)' }}
                 >
                   Voir le profil
                 </Link>
@@ -506,28 +466,18 @@ export default function MessagesPage() {
                       alignSelf: isMe ? 'flex-end' : 'flex-start',
                       maxWidth: '75%',
                       padding: '0.5rem 0.75rem',
-                      background: isMe ? '#2563eb' : '#f3f4f6',
-                      color: isMe ? '#fff' : '#111',
-                      borderRadius: 12,
-                      borderRadiusBottomRight: isMe ? 4 : 12,
-                      borderRadiusBottomLeft: isMe ? 12 : 4,
+                      background: isMe ? 'var(--color-primary)' : 'var(--color-border-muted)',
+                      color: isMe ? '#fff' : 'var(--color-text)',
+                      borderRadius: 'var(--radius-md)',
+                      borderRadiusBottomRight: isMe ? 4 : 'var(--radius-md)',
+                      borderRadiusBottomLeft: isMe ? 'var(--radius-md)' : 4,
                     }}
                   >
                     {!isMe && (
-                      <p style={{ margin: '0 0 0.2rem', fontSize: '0.7rem', opacity: 0.9 }}>
-                        {msg.senderName}
-                      </p>
+                      <p style={{ margin: '0 0 0.2rem', fontSize: '0.7rem', opacity: 0.9 }}>{msg.senderName}</p>
                     )}
-                    <p style={{ margin: 0, fontSize: '0.9rem', wordBreak: 'break-word' }}>
-                      {msg.text}
-                    </p>
-                    <p
-                      style={{
-                        margin: '0.2rem 0 0',
-                        fontSize: '0.7rem',
-                        opacity: 0.8,
-                      }}
-                    >
+                    <p style={{ margin: 0, fontSize: '0.9rem', wordBreak: 'break-word' }}>{msg.text}</p>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.7rem', opacity: 0.8 }}>
                       {formatDate(msg.createdAt)}
                     </p>
                   </div>
@@ -539,7 +489,7 @@ export default function MessagesPage() {
             <div
               style={{
                 padding: '0.75rem 1rem',
-                borderTop: '1px solid #e5e7eb',
+                borderTop: '1px solid var(--color-border-muted)',
                 display: 'flex',
                 gap: '0.5rem',
               }}
@@ -550,27 +500,14 @@ export default function MessagesPage() {
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 placeholder="Écrire un message..."
-                style={{
-                  flex: 1,
-                  padding: '0.5rem 0.75rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: 8,
-                  fontSize: '0.9rem',
-                }}
+                className="input-base"
+                style={{ flex: 1 }}
               />
               <button
                 type="button"
                 onClick={handleSend}
                 disabled={!newMessage.trim() || sending}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#2563eb',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 8,
-                  cursor: sending ? 'wait' : 'pointer',
-                  fontWeight: 500,
-                }}
+                className="btn-primary"
               >
                 {sending ? '...' : 'Envoyer'}
               </button>
@@ -583,7 +520,7 @@ export default function MessagesPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#9ca3af',
+              color: 'var(--color-text-subtle)',
               fontSize: '0.9rem',
             }}
           >

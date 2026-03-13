@@ -94,11 +94,25 @@ select {
   padding: 0.5rem 1rem;
   font-weight: 600;
   font-size: 0.875rem;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 }
 
 .btn-primary:hover {
   background: var(--color-primary-hover);
+}
+
+/* Liens stylés en bouton : apparence constante, pas de changement au survol */
+a.btn-primary {
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+}
+
+a.btn-primary:hover {
+  text-decoration: none;
+  color: white;
+  background: var(--color-primary);
+  /* Même apparence qu'au repos - pas d'effet "plein" */
 }
 
 .btn-secondary {

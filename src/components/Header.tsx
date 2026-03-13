@@ -1,19 +1,12 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 
 export default function Header() {
   const currentUser = useStore((s) => s.currentUser)
-  const setCurrentUser = useStore((s) => s.setCurrentUser)
   const eventSearchQuery = useStore((s) => s.eventSearchQuery)
   const setEventSearchQuery = useStore((s) => s.setEventSearchQuery)
-  const navigate = useNavigate()
   const location = useLocation()
   const showSearch = location.pathname === '/' || location.pathname === '/my-events'
-
-  const handleLogout = () => {
-    setCurrentUser(null)
-    navigate('/auth')
-  }
 
   return (
     <header
@@ -87,19 +80,6 @@ export default function Header() {
               )}
               {currentUser.name}
             </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--color-text-subtle)',
-                fontSize: '0.875rem',
-                padding: 0,
-              }}
-            >
-              Déconnexion
-            </button>
           </>
         )}
       </div>
