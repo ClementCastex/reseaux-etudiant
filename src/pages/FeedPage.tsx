@@ -10,17 +10,11 @@ export default function FeedPage() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Fil d'actualité</h1>
+        <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)' }}>Fil d'actualité</h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          style={{
-            padding: '0.5rem 1.25rem',
-            background: '#2563eb',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 4,
-            fontWeight: 500,
-          }}
+          className="btn-primary"
+          style={{ padding: '0.5rem 1.25rem' }}
         >
           Créer un événement
         </button>
@@ -28,7 +22,7 @@ export default function FeedPage() {
 
       <div>
         {events.length === 0 ? (
-          <p style={{ color: '#6b7280', padding: '2rem', textAlign: 'center' }}>
+          <p style={{ color: 'var(--color-text-muted)', padding: '2rem', textAlign: 'center' }}>
             Aucun événement pour le moment. Créez le premier !
           </p>
         ) : (

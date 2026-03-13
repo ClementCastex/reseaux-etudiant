@@ -91,16 +91,19 @@ export default function EventDetailPage() {
     }
   }
 
+  const typeColor = (event.type === 'soiree' ? 'var(--color-type-soiree)' : event.type === 'sport' ? 'var(--color-type-sport)' : event.type === 'etude' ? 'var(--color-type-etude)' : event.type === 'culture' ? 'var(--color-type-culture)' : 'var(--color-type-autre)')
+
   return (
     <div
       style={{
-        background: '#fff',
-        border: '1px solid #e5e7eb',
-        borderRadius: 8,
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border-muted)',
+        borderRadius: 'var(--radius-md)',
         padding: '2rem',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      <Link to="/" style={{ fontSize: '0.875rem', marginBottom: '1rem', display: 'inline-block' }}>
+      <Link to="/" style={{ fontSize: '0.875rem', marginBottom: '1rem', display: 'inline-block', color: 'var(--color-primary)' }}>
         ← Retour au fil
       </Link>
 
@@ -108,42 +111,45 @@ export default function EventDetailPage() {
         <img
           src={event.imageUrl}
           alt=""
-          style={{ width: '100%', maxHeight: 280, objectFit: 'cover', borderRadius: 8, marginBottom: '1rem' }}
+          style={{ width: '100%', maxHeight: 280, objectFit: 'cover', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}
         />
       )}
 
       <span
         style={{
           fontSize: '0.75rem',
-          background: '#e0e7ff',
-          color: '#4338ca',
+          fontWeight: 600,
+          background: typeColor,
+          color: '#fff',
           padding: '4px 10px',
-          borderRadius: 4,
+          borderRadius: 'var(--radius-sm)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.02em',
         }}
       >
         {EVENT_TYPE_LABELS[event.type] ?? event.type}
       </span>
 
-      <h1 style={{ margin: '0.75rem 0', fontSize: '1.5rem' }}>{event.title}</h1>
+      <h1 style={{ margin: '0.75rem 0', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)' }}>{event.title}</h1>
 
-      <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>
+      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
         {campus?.name} · {startStr} → {endStr}
       </p>
 
-      <p style={{ margin: '1rem 0', lineHeight: 1.5 }}>{event.description}</p>
+      <p style={{ margin: '1rem 0', lineHeight: 1.5, color: 'var(--color-text)' }}>{event.description}</p>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0', fontSize: '0.875rem', color: '#6b7280' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
         {creator?.avatarUrl ? (
           <img src={creator.avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
         ) : (
-          <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#667eea', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>
+          <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>
             {creator?.name?.charAt(0) ?? '?'}
           </div>
         )}
         <span>Créé par <Link to={`/profile/${event.creatorId}`}>{creator?.name ?? 'Inconnu'}</Link></span>
       </div>
 
-      <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
+      <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
         {event.participantIds.length} participant(s)
       </p>
 
@@ -155,7 +161,7 @@ export default function EventDetailPage() {
               {participant?.avatarUrl ? (
                 <img src={participant.avatarUrl} alt="" style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} />
               ) : (
-                <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#667eea', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 600 }}>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 600 }}>
                   {participant?.name?.charAt(0) ?? '?'}
                 </div>
               )}
@@ -171,12 +177,8 @@ export default function EventDetailPage() {
             <button
               onClick={handleLeave}
               disabled={loading}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#f3f4f6',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
-              }}
+              className="btn-secondary"
+              style={{ padding: '0.5rem 1rem' }}
             >
               Se désinscrire
             </button>
@@ -184,13 +186,8 @@ export default function EventDetailPage() {
             <button
               onClick={handleParticipate}
               disabled={loading}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#2563eb',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 4,
-              }}
+              className="btn-primary"
+              style={{ padding: '0.5rem 1rem' }}
             >
               Participer
             </button>
@@ -202,19 +199,20 @@ export default function EventDetailPage() {
               title={!canDelete ? 'Suppression possible uniquement plus de 7 jours avant le début' : ''}
               style={{
                 padding: '0.5rem 1rem',
-                background: canDelete ? '#dc2626' : '#e5e7eb',
-                color: canDelete ? '#fff' : '#9ca3af',
+                background: canDelete ? 'var(--color-error)' : 'var(--color-border-muted)',
+                color: canDelete ? '#fff' : 'var(--color-text-subtle)',
                 border: 'none',
-                borderRadius: 4,
+                borderRadius: 'var(--radius-sm)',
                 cursor: canDelete ? 'pointer' : 'not-allowed',
+                fontWeight: 500,
               }}
             >
               Supprimer l&apos;événement
             </button>
           )}
-          {deleteError && <span style={{ color: '#dc2626', fontSize: '0.875rem' }}>{deleteError}</span>}
+          {deleteError && <span style={{ color: 'var(--color-error)', fontSize: '0.875rem' }}>{deleteError}</span>}
           {currentUser.id === event.creatorId && !canDelete && start <= sevenDaysFromNow && (
-            <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-subtle)' }}>
               Suppression possible uniquement plus de 7 jours avant le début
             </span>
           )}

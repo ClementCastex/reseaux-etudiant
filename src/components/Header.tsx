@@ -14,26 +14,33 @@ export default function Header() {
   return (
     <header
       style={{
-        background: '#fff',
-        borderBottom: '1px solid #e5e7eb',
+        background: 'var(--color-surface)',
+        borderBottom: '1px solid var(--color-border-muted)',
         padding: '0.75rem 2rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '1rem',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <nav style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        <Link to="/" style={{ fontWeight: 600, color: '#333' }}>
+        <Link to="/" style={{ fontWeight: 600, color: 'var(--color-text)', textDecoration: 'none' }}>
           Fil d'actualité
         </Link>
-        <Link to="/my-events">Mes événements</Link>
+        <Link to="/my-events" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+          Mes événements
+        </Link>
       </nav>
 
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        <Link to="/messages">Messages</Link>
-        <Link to="/notifications">Notifications</Link>
+        <Link to="/messages" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+          Messages
+        </Link>
+        <Link to="/notifications" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+          Notifications
+        </Link>
         {currentUser && (
           <>
             <Link
@@ -42,16 +49,19 @@ export default function Header() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                padding: '0.25rem 0.5rem',
-                background: '#f3f4f6',
-                borderRadius: 20,
+                padding: '0.35rem 0.75rem',
+                background: 'var(--color-primary-light)',
+                borderRadius: 'var(--radius-full)',
                 fontSize: '0.875rem',
+                color: 'var(--color-primary-hover)',
+                textDecoration: 'none',
+                fontWeight: 500,
               }}
             >
               {currentUser.avatarUrl ? (
-                <img src={currentUser.avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
+                <img src={currentUser.avatarUrl} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
               ) : (
-                <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 600 }}>
                   {currentUser.name.charAt(0)}
                 </div>
               )}
@@ -63,7 +73,7 @@ export default function Header() {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#6b7280',
+                color: 'var(--color-text-subtle)',
                 fontSize: '0.875rem',
                 padding: 0,
               }}

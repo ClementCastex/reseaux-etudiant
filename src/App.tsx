@@ -37,18 +37,18 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
-        <p>Chargement...</p>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>Chargement...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', padding: '2rem' }}>
-        <p style={{ color: '#dc2626', marginBottom: '1rem' }}>{error}</p>
-        <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>Lancez l&apos;API avec : <code>npm run dev:api</code></p>
-        <button onClick={() => loadFromApi()} style={{ padding: '0.5rem 1rem', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4 }}>Réessayer</button>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '2rem' }}>
+        <p style={{ color: 'var(--color-error)', marginBottom: '1rem', fontWeight: 500 }}>{error}</p>
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>Lancez l&apos;API avec : <code style={{ background: 'var(--color-surface)', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-sm)' }}>npm run dev:api</code></p>
+        <button onClick={() => loadFromApi()} className="btn-primary">Réessayer</button>
       </div>
     )
   }

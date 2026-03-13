@@ -28,56 +28,78 @@ export default function EventCard({ event }: EventCardProps) {
   })
   const endStr = end.toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 
+  const typeColor = (event.type === 'soiree' ? 'var(--color-type-soiree)' : event.type === 'sport' ? 'var(--color-type-sport)' : event.type === 'etude' ? 'var(--color-type-etude)' : event.type === 'culture' ? 'var(--color-type-culture)' : 'var(--color-type-autre)')
+
   return (
     <div
       style={{
-        background: '#fff',
-        border: '1px solid #e5e7eb',
-        borderRadius: 8,
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border-muted)',
+        borderRadius: 'var(--radius-md)',
         overflow: 'hidden',
         marginBottom: '1rem',
+        boxShadow: 'var(--shadow-sm)',
+        transition: 'box-shadow 0.2s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
       }}
     >
       {event.imageUrl && (
-        <img
-          src={event.imageUrl}
-          alt=""
-          style={{ width: '100%', height: 140, objectFit: 'cover' }}
-        />
+        <div style={{ height: 160, overflow: 'hidden' }}>
+          <img
+            src={event.imageUrl}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
       )}
-      <div style={{ padding: '1rem 1.25rem' }}>
+      <div style={{ padding: '1.25rem 1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
           <div style={{ flex: 1 }}>
-          <span
-            style={{
-              fontSize: '0.75rem',
-              background: '#e0e7ff',
-              color: '#4338ca',
-              padding: '2px 8px',
-              borderRadius: 4,
-            }}
-          >
-            {EVENT_TYPE_LABELS[event.type] ?? event.type}
-          </span>
-          <h3 style={{ margin: '0.5rem 0', fontSize: '1.1rem' }}>{event.title}</h3>
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-            {campus?.name} · {startStr} → {endStr}
-          </p>
-          <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem' }}>{event.description}</p>
-          <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: '#9ca3af' }}>
-            {event.participantIds.length} participant(s)
-          </p>
+            <span
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                background: typeColor,
+                color: '#fff',
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-sm)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.02em',
+              }}
+            >
+              {EVENT_TYPE_LABELS[event.type] ?? event.type}
+            </span>
+            <h3 style={{ margin: '0.6rem 0 0.25rem', fontSize: '1.15rem', fontWeight: 600, color: 'var(--color-text)' }}>
+              {event.title}
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+              {campus?.name} · {startStr} → {endStr}
+            </p>
+            <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: 1.4 }}>
+              {event.description}
+            </p>
+            <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'var(--color-text-subtle)' }}>
+              {event.participantIds.length} participant(s)
+            </p>
           </div>
           <Link
-          to={`/event/${event.id}`}
-          style={{
-            padding: '0.5rem 1rem',
-            background: '#2563eb',
-            color: '#fff',
-            borderRadius: 4,
-            fontSize: '0.875rem',
-            whiteSpace: 'nowrap',
-          }}
+            to={`/event/${event.id}`}
+            style={{
+              padding: '0.5rem 1.25rem',
+              background: 'var(--color-primary)',
+              color: '#fff',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
+              textDecoration: 'none',
+              transition: 'background 0.2s ease',
+            }}
           >
             Voir le détail
           </Link>

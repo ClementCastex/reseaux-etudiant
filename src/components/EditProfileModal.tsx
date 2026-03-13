@@ -73,17 +73,19 @@ export default function EditProfileModal({ student, onClose }: EditProfileModalP
     >
       <div
         style={{
-          background: '#fff',
+          background: 'var(--color-surface)',
           padding: '2rem',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-md)',
           maxWidth: 480,
           width: '90%',
           maxHeight: '90vh',
           overflow: 'auto',
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--color-border-muted)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 style={{ margin: '0 0 1.5rem' }}>Modifier le profil</h2>
+        <h2 style={{ margin: '0 0 1.5rem', color: 'var(--color-text)', fontWeight: 700 }}>Modifier le profil</h2>
 
         <form onSubmit={handleSubmit}>
           {/* Photo de profil */}
@@ -99,12 +101,12 @@ export default function EditProfileModal({ student, onClose }: EditProfileModalP
                   height: 80,
                   borderRadius: '50%',
                   overflow: 'hidden',
-                  background: '#e5e7eb',
+                  background: 'var(--color-primary-light)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '2px dashed #9ca3af',
+                  border: '2px dashed var(--color-primary)',
                 }}
               >
                 {avatarUrl ? (

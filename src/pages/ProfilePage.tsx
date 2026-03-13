@@ -36,21 +36,23 @@ export default function ProfilePage() {
   return (
     <div
       style={{
-        background: '#fff',
-        border: '1px solid #e5e7eb',
-        borderRadius: 8,
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border-muted)',
+        borderRadius: 'var(--radius-md)',
         padding: '2rem',
         maxWidth: 480,
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <span
           style={{
             fontSize: '0.75rem',
-            background: '#e0e7ff',
-            color: '#4338ca',
+            fontWeight: 600,
+            background: 'var(--color-primary-light)',
+            color: 'var(--color-primary-hover)',
             padding: '4px 10px',
-            borderRadius: 4,
+            borderRadius: 'var(--radius-sm)',
           }}
         >
           {campus?.name ?? 'Campus'}
@@ -58,15 +60,8 @@ export default function ProfilePage() {
         {isOwnProfile && (
           <button
             onClick={() => setShowEditModal(true)}
-            style={{
-              padding: '0.4rem 0.9rem',
-              fontSize: '0.875rem',
-              background: '#4338ca',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer',
-            }}
+            className="btn-primary"
+            style={{ padding: '0.4rem 0.9rem', fontSize: '0.875rem' }}
           >
             Modifier le profil
           </button>
@@ -84,7 +79,7 @@ export default function ProfilePage() {
               height: 120,
               borderRadius: '50%',
               objectFit: 'cover',
-              border: '3px solid #e5e7eb',
+              border: '3px solid var(--color-border-muted)',
             }}
           />
         ) : (
@@ -93,7 +88,7 @@ export default function ProfilePage() {
               width: 120,
               height: 120,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'var(--color-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -107,8 +102,8 @@ export default function ProfilePage() {
         )}
       </div>
 
-      <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem' }}>{student.name}</h1>
-      <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>{student.email}</p>
+      <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-text)' }}>{student.name}</h1>
+      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{student.email}</p>
 
       <div style={{ marginTop: '1.25rem', fontSize: '0.9rem' }}>
         <p style={{ margin: '0.5rem 0' }}>
@@ -131,11 +126,12 @@ export default function ProfilePage() {
           style={{
             marginTop: '1rem',
             padding: '1rem',
-            background: '#f9fafb',
-            borderRadius: 6,
+            background: 'var(--color-primary-light)',
+            borderRadius: 'var(--radius-sm)',
             fontSize: '0.9rem',
             lineHeight: 1.5,
-            borderLeft: '3px solid #e0e7ff',
+            borderLeft: '3px solid var(--color-primary)',
+            color: 'var(--color-text)',
           }}
         >
           {student.bio}
@@ -144,7 +140,7 @@ export default function ProfilePage() {
 
       {student.interests && student.interests.length > 0 && (
         <div style={{ marginTop: '1rem' }}>
-          <p style={{ margin: '0 0 0.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
+          <p style={{ margin: '0 0 0.5rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
             Centres d'intérêt
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -154,9 +150,9 @@ export default function ProfilePage() {
                 style={{
                   padding: '0.25rem 0.6rem',
                   fontSize: '0.8rem',
-                  background: '#e0e7ff',
-                  color: '#4338ca',
-                  borderRadius: 20,
+                  background: 'var(--color-primary-light)',
+                  color: 'var(--color-primary-hover)',
+                  borderRadius: 'var(--radius-full)',
                 }}
               >
                 {EVENT_TYPE_LABELS[i] ?? i}
@@ -172,6 +168,7 @@ export default function ProfilePage() {
           display: 'inline-block',
           marginTop: '1.5rem',
           fontSize: '0.875rem',
+          color: 'var(--color-primary)',
         }}
       >
         ← Retour au fil

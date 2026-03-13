@@ -62,26 +62,33 @@ export default function AuthPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f5f5f5',
+        background: 'var(--color-bg)',
+        padding: '1rem',
       }}
     >
       <div
         style={{
-          background: '#fff',
+          background: 'var(--color-surface)',
           padding: '2rem',
-          borderRadius: 8,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          borderRadius: 'var(--radius-md)',
+          boxShadow: 'var(--shadow-lg)',
           width: '100%',
           maxWidth: 400,
+          border: '1px solid var(--color-border-muted)',
         }}
       >
-        <h1 style={{ margin: '0 0 1.5rem', fontSize: '1.5rem' }}>
-          {mode === 'login' ? 'Connexion' : 'Inscription'}
-        </h1>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+            Réseau Étudiant
+          </h1>
+          <p style={{ margin: '0.25rem 0 0', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+            {mode === 'login' ? 'Connexion' : 'Inscription'}
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
               Email
             </label>
             <input
@@ -90,19 +97,15 @@ export default function AuthPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="alice@campus.fr"
               required={mode === 'login'}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
-              }}
+              className="input-base"
+              style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </div>
 
           {mode === 'register' && (
             <>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
                   Nom
                 </label>
                 <input
@@ -110,27 +113,19 @@ export default function AuthPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Votre nom"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: 4,
-                  }}
+                  className="input-base"
+                  style={{ width: '100%', boxSizing: 'border-box' }}
                 />
               </div>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
                   Campus
                 </label>
                 <select
                   value={campusId}
                   onChange={(e) => setCampusId(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: 4,
-                  }}
+                  className="input-base"
+                  style={{ width: '100%', boxSizing: 'border-box' }}
                 >
                   {campuses.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -143,7 +138,7 @@ export default function AuthPage() {
           )}
 
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
               Mot de passe (mock)
             </label>
             <input
@@ -151,45 +146,34 @@ export default function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Non vérifié en MVP"
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
-              }}
+              className="input-base"
+              style={{ width: '100%', boxSizing: 'border-box' }}
             />
           </div>
 
           {error && (
-            <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '1rem' }}>
+            <p style={{ color: 'var(--color-error)', fontSize: '0.875rem', marginBottom: '1rem' }}>
               {error}
             </p>
           )}
 
           <button
             type="submit"
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: '#2563eb',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
-              fontWeight: 500,
-            }}
+            className="btn-primary"
+            style={{ width: '100%', padding: '0.75rem 1rem' }}
           >
             {mode === 'login' ? 'Se connecter' : "S'inscrire"}
           </button>
         </form>
 
-        <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
+        <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
           {mode === 'login' ? (
             <>
               Pas de compte ?{' '}
               <button
                 type="button"
                 onClick={() => setMode('register')}
-                style={{ background: 'none', border: 'none', color: '#2563eb', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: 'var(--color-primary)', padding: 0, fontWeight: 600 }}
               >
                 S'inscrire
               </button>
@@ -200,7 +184,7 @@ export default function AuthPage() {
               <button
                 type="button"
                 onClick={() => setMode('login')}
-                style={{ background: 'none', border: 'none', color: '#2563eb', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: 'var(--color-primary)', padding: 0, fontWeight: 600 }}
               >
                 Se connecter
               </button>
@@ -208,7 +192,7 @@ export default function AuthPage() {
           )}
         </p>
 
-        <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#9ca3af' }}>
+        <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--color-text-subtle)', textAlign: 'center' }}>
           Comptes de démo : alice@campus.fr, bob@campus.fr, clara@campus.fr
         </p>
       </div>

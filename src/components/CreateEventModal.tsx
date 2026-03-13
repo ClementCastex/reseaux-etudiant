@@ -82,17 +82,19 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
     >
       <div
         style={{
-          background: '#fff',
+          background: 'var(--color-surface)',
           padding: '2rem',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-md)',
           maxWidth: 480,
           width: '90%',
           maxHeight: '90vh',
           overflow: 'auto',
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--color-border-muted)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 style={{ margin: '0 0 1.5rem' }}>Créer un événement</h2>
+        <h2 style={{ margin: '0 0 1.5rem', color: 'var(--color-text)', fontWeight: 700 }}>Créer un événement</h2>
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
@@ -107,8 +109,8 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
+                border: '1px solid var(--color-border-muted)',
+                borderRadius: 'var(--radius-sm)',
               }}
             />
           </div>
@@ -124,8 +126,8 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
+                border: '1px solid var(--color-border-muted)',
+                borderRadius: 'var(--radius-sm)',
               }}
             />
           </div>
@@ -144,16 +146,16 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               />
               {imageUrl ? (
                 <>
-                  <img src={imageUrl} alt="Aperçu" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 4 }} />
+                  <img src={imageUrl} alt="Aperçu" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
                   <button type="button" onClick={() => fileInputRef.current?.click()} style={{ padding: '0.35rem 0.75rem', fontSize: '0.875rem' }}>
                     Changer
                   </button>
-                  <button type="button" onClick={() => setImageUrl(null)} style={{ padding: '0.35rem 0.75rem', fontSize: '0.875rem', background: '#fef2f2', color: '#dc2626' }}>
+                  <button type="button" onClick={() => setImageUrl(null)} style={{ padding: '0.35rem 0.75rem', fontSize: '0.875rem', background: 'var(--color-accent-light)', color: 'var(--color-error)' }}>
                     Supprimer
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={() => fileInputRef.current?.click()} style={{ padding: '0.5rem 1rem', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 4 }}>
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary" style={{ padding: '0.5rem 1rem' }}>
                   Ajouter une image
                 </button>
               )}
@@ -172,8 +174,8 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
+                border: '1px solid var(--color-border-muted)',
+                borderRadius: 'var(--radius-sm)',
               }}
             />
           </div>
@@ -190,8 +192,8 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
+                border: '1px solid var(--color-border-muted)',
+                borderRadius: 'var(--radius-sm)',
               }}
             />
           </div>
@@ -206,8 +208,8 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
+                border: '1px solid var(--color-border-muted)',
+                borderRadius: 'var(--radius-sm)',
               }}
             >
               {campuses.map((c) => (
@@ -228,8 +230,8 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
+                border: '1px solid var(--color-border-muted)',
+                borderRadius: 'var(--radius-sm)',
               }}
             >
               {EVENT_TYPES.map((t) => (
@@ -240,32 +242,23 @@ export default function CreateEventModal({ onClose }: CreateEventModalProps) {
             </select>
           </div>
 
-          {error && <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--color-error)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{error}</p>}
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
             <button
               type="button"
               onClick={onClose}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#f3f4f6',
-                border: '1px solid #d1d5db',
-                borderRadius: 4,
-              }}
-            >
-              Annuler
+            className="btn-secondary"
+            style={{ padding: '0.5rem 1rem' }}
+          >
+            Annuler
             </button>
             <button
               type="submit"
               disabled={submitting}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#2563eb',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 4,
-              }}
-            >
-              {submitting ? 'Création...' : 'Créer'}
+            className="btn-primary"
+            style={{ padding: '0.5rem 1rem' }}
+          >
+            {submitting ? 'Création...' : 'Créer'}
             </button>
           </div>
         </form>
