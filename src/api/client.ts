@@ -1,4 +1,4 @@
-import type { Campus, Student, Event, EventType } from '../types'
+import type { Campus, Student, Event, EventType, Conversation, Message } from '../types'
 
 const API_BASE = '/api'
 
@@ -52,5 +52,29 @@ export const api = {
       fetchApi<Event>(`/events/${eventId}/leave`, { method: 'POST', body: JSON.stringify({ studentId }) }),
     delete: (eventId: string, creatorId: string) =>
       fetchApi<void>(`/events/${eventId}`, { method: 'DELETE', body: JSON.stringify({ creatorId }) }),
+  },
+  friendships: {
+    list: (studentId: string) =>
+      fetchApi<Student[]>(`/students/${studentId}/friends`),
+    add: (studentId: string, friendId: string) =>
+      fetchApi<Student>(`/friendships`, { method: 'POST', body: JSON.stringify({ studentId, friendId }) }),
+    remove: (studentId: string, friendId: string) =>
+      fetchApi<void>(`/friendships`, { method: 'DELETE', body: JSON.stringify({ studentId, friendId }) }),
+  },
+  conversations: {
+    list: (studentId: string) =>
+      fetchApi<Conversation[]>(`/conversations?studentId=${encodeURIComponent(studentId)}`),
+    create: (participantIds: string[], isGroup?: boolean, name?: string) =>
+      fetchApi<Conversation>(`/conversations`, {
+        method: 'POST',
+        body: JSON.stringify({ participantIds, isGroup, name }),
+      }),
+    getMessages: (conversationId: string, studentId: string) =>
+      fetchApi<Message[]>(`/conversations/${conversationId}/messages?studentId=${encodeURIComponent(studentId)}`),
+    sendMessage: (conversationId: string, senderId: string, text: string) =>
+      fetchApi<Message>(`/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ senderId, text }),
+      }),
   },
 }

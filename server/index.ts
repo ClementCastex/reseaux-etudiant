@@ -294,6 +294,204 @@ app.delete('/api/events/:id', async (req, res) => {
   }
 })
 
+// === AMIS (FRIENDSHIPS) ===
+
+app.get('/api/students/:id/friends', async (req, res) => {
+  try {
+    const friendships = await prisma.friendship.findMany({
+      where: { studentId: req.params.id },
+      include: { friend: true },
+    })
+    res.json(friendships.map((f) => formatStudent(f.friend)))
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+app.post('/api/friendships', async (req, res) => {
+  try {
+    const { studentId, friendId } = req.body
+    if (!studentId || !friendId || studentId === friendId) {
+      return res.status(400).json({ error: 'studentId et friendId requis (distincts)' })
+    }
+    await prisma.friendship.create({
+      data: { studentId, friendId },
+    })
+    const friend = await prisma.student.findUnique({ where: { id: friendId } })
+    res.status(201).json(formatStudent(friend!))
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+app.delete('/api/friendships', async (req, res) => {
+  try {
+    const { studentId, friendId } = req.body
+    if (!studentId || !friendId) {
+      return res.status(400).json({ error: 'studentId et friendId requis' })
+    }
+    await prisma.friendship.deleteMany({
+      where: { studentId, friendId },
+    })
+    res.status(204).send()
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+// === MESSAGERIE ===
+
+interface FormattedConversation {
+  id: string
+  isGroup: boolean
+  name: string | null
+  participants: { id: string; name: string; avatarUrl: string | null }[]
+  lastMessage?: { text: string; createdAt: string; senderName: string }
+}
+
+app.get('/api/conversations', async (req, res) => {
+  try {
+    const { studentId } = req.query
+    if (!studentId || typeof studentId !== 'string') {
+      return res.status(400).json({ error: 'studentId requis' })
+    }
+    const parts = await prisma.conversationParticipant.findMany({
+      where: { studentId },
+      include: {
+        conversation: {
+          include: {
+            participants: { include: { student: true } },
+            messages: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+              include: { sender: true },
+            },
+          },
+        },
+      },
+    })
+    const formatted: FormattedConversation[] = parts.map((p) => {
+      const c = p.conversation
+      const lastMsg = c.messages[0]
+      return {
+        id: c.id,
+        isGroup: c.isGroup,
+        name: c.name,
+        participants: c.participants.map((x) => ({
+          id: x.student.id,
+          name: x.student.name,
+          avatarUrl: x.student.avatarUrl,
+        })),
+        lastMessage: lastMsg
+          ? {
+              text: lastMsg.text,
+              createdAt: lastMsg.createdAt.toISOString(),
+              senderName: lastMsg.sender.name,
+            }
+          : undefined,
+      }
+    })
+    res.json(formatted)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+app.get('/api/conversations/:id/messages', async (req, res) => {
+  try {
+    const { studentId } = req.query
+    if (!studentId || typeof studentId !== 'string') {
+      return res.status(400).json({ error: 'studentId requis' })
+    }
+    const part = await prisma.conversationParticipant.findFirst({
+      where: { conversationId: req.params.id, studentId },
+    })
+    if (!part) return res.status(403).json({ error: 'Non autorisé' })
+    const messages = await prisma.message.findMany({
+      where: { conversationId: req.params.id },
+      include: { sender: true },
+      orderBy: { createdAt: 'asc' },
+    })
+    res.json(
+      messages.map((m) => ({
+        id: m.id,
+        text: m.text,
+        createdAt: m.createdAt.toISOString(),
+        senderId: m.senderId,
+        senderName: m.sender.name,
+        senderAvatarUrl: m.sender.avatarUrl,
+      }))
+    )
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+app.post('/api/conversations', async (req, res) => {
+  try {
+    const { participantIds, isGroup, name } = req.body
+    if (!Array.isArray(participantIds) || participantIds.length < 1) {
+      return res.status(400).json({ error: 'participantIds requis (array)' })
+    }
+    const conv = await prisma.conversation.create({
+      data: {
+        isGroup: !!isGroup,
+        name: name ?? null,
+        participants: {
+          create: participantIds.map((id: string) => ({ studentId: id })),
+        },
+      },
+      include: { participants: { include: { student: true } } },
+    })
+    res.status(201).json({
+      id: conv.id,
+      isGroup: conv.isGroup,
+      name: conv.name,
+      participants: conv.participants.map((x) => ({
+        id: x.student.id,
+        name: x.student.name,
+        avatarUrl: x.student.avatarUrl,
+      })),
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+app.post('/api/conversations/:id/messages', async (req, res) => {
+  try {
+    const { senderId, text } = req.body
+    if (!senderId || !text || typeof text !== 'string') {
+      return res.status(400).json({ error: 'senderId et text requis' })
+    }
+    const part = await prisma.conversationParticipant.findFirst({
+      where: { conversationId: req.params.id, studentId: senderId },
+    })
+    if (!part) return res.status(403).json({ error: 'Non autorisé' })
+    const msg = await prisma.message.create({
+      data: { conversationId: req.params.id, senderId, text },
+      include: { sender: true },
+    })
+    res.status(201).json({
+      id: msg.id,
+      text: msg.text,
+      createdAt: msg.createdAt.toISOString(),
+      senderId: msg.senderId,
+      senderName: msg.sender.name,
+      senderAvatarUrl: msg.sender.avatarUrl,
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`API prête sur http://localhost:${PORT}`)
 })
