@@ -7,7 +7,7 @@ import FeedPage from './pages/FeedPage'
 import ProfilePage from './pages/ProfilePage'
 import EventDetailPage from './pages/EventDetailPage'
 import MyEventsPage from './pages/MyEventsPage'
-import MessagesPlaceholder from './pages/MessagesPlaceholder'
+import MessagesPage from './pages/MessagesPage'
 import NotificationsPlaceholder from './pages/NotificationsPlaceholder'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -76,7 +76,7 @@ export default function App() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="profile/:studentId" element={<ProfilePage />} />
         <Route path="event/:eventId" element={<EventDetailPage />} />
-        <Route path="messages" element={<MessagesPlaceholder />} />
+        <Route path="messages" element={<MessagesPage />} />
         <Route path="notifications" element={<NotificationsPlaceholder />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

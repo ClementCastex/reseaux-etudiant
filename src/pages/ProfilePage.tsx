@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import EditProfileModal from '../components/EditProfileModal'
+import FormationBadge from '../components/FormationBadge'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   soiree: 'Soirée',
@@ -44,6 +45,7 @@ export default function ProfilePage() {
         boxShadow: 'var(--shadow-sm)',
       }}
     >
+<<<<<<< HEAD
       <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <span
           style={{
@@ -57,6 +59,23 @@ export default function ProfilePage() {
         >
           {campus?.name ?? 'Campus'}
         </span>
+=======
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: '0.75rem',
+              background: '#e0e7ff',
+              color: '#4338ca',
+              padding: '4px 10px',
+              borderRadius: 4,
+            }}
+          >
+            {campus?.name ?? 'Campus'}
+          </span>
+          {student.formation && <FormationBadge formation={student.formation} />}
+        </div>
+>>>>>>> b6a11f0eecb6a11df19f2b68ac0211110c98a855
         {isOwnProfile && (
           <button
             onClick={() => setShowEditModal(true)}
@@ -159,6 +178,24 @@ export default function ProfilePage() {
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      {!isOwnProfile && currentUser && (
+        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
+          <Link
+            to={`/messages?new=${student.id}`}
+            style={{
+              padding: '0.5rem 1rem',
+              background: '#2563eb',
+              color: '#fff',
+              borderRadius: 4,
+              fontSize: '0.875rem',
+              textDecoration: 'none',
+            }}
+          >
+            Envoyer un message
+          </Link>
         </div>
       )}
 

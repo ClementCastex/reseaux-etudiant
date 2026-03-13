@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Event } from '../types'
 import { useStore } from '../store/useStore'
+import FormationBadge from './FormationBadge'
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   soiree: 'Soirée',
@@ -16,7 +17,11 @@ interface EventCardProps {
 
 export default function EventCard({ event }: EventCardProps) {
   const campuses = useStore((s) => s.campuses)
+  const students = useStore((s) => s.students)
+  const friendIds = useStore((s) => s.friendIds)
   const campus = campuses.find((c) => c.id === event.campusId)
+  const creator = students.find((s) => s.id === event.creatorId)
+  const hasFriendParticipating = friendIds.some((fid) => event.participantIds.includes(fid))
   const start = new Date(event.startDate)
   const end = new Date(event.endDate)
   const startStr = start.toLocaleDateString('fr-FR', {
@@ -60,6 +65,7 @@ export default function EventCard({ event }: EventCardProps) {
       <div style={{ padding: '1.25rem 1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
           <div style={{ flex: 1 }}>
+<<<<<<< HEAD
             <span
               style={{
                 fontSize: '0.75rem',
@@ -70,10 +76,21 @@ export default function EventCard({ event }: EventCardProps) {
                 borderRadius: 'var(--radius-sm)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.02em',
+=======
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <span
+              style={{
+                fontSize: '0.75rem',
+                background: '#e0e7ff',
+                color: '#4338ca',
+                padding: '2px 8px',
+                borderRadius: 4,
+>>>>>>> b6a11f0eecb6a11df19f2b68ac0211110c98a855
               }}
             >
               {EVENT_TYPE_LABELS[event.type] ?? event.type}
             </span>
+<<<<<<< HEAD
             <h3 style={{ margin: '0.6rem 0 0.25rem', fontSize: '1.15rem', fontWeight: 600, color: 'var(--color-text)' }}>
               {event.title}
             </h3>
@@ -86,6 +103,31 @@ export default function EventCard({ event }: EventCardProps) {
             <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'var(--color-text-subtle)' }}>
               {event.participantIds.length} participant(s)
             </p>
+=======
+            {creator?.formation && <FormationBadge formation={creator.formation} size="sm" />}
+            {hasFriendParticipating && (
+              <span
+                style={{
+                  fontSize: '0.7rem',
+                  background: '#dcfce7',
+                  color: '#166534',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                }}
+              >
+                Un ami participe
+              </span>
+            )}
+          </div>
+          <h3 style={{ margin: '0.5rem 0', fontSize: '1.1rem' }}>{event.title}</h3>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+            {campus?.name} · {startStr} → {endStr}
+          </p>
+          <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem' }}>{event.description}</p>
+          <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: '#9ca3af' }}>
+            {event.participantIds.length} participant(s)
+          </p>
+>>>>>>> b6a11f0eecb6a11df19f2b68ac0211110c98a855
           </div>
           <Link
             to={`/event/${event.id}`}

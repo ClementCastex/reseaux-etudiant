@@ -1,10 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 
 export default function Header() {
   const currentUser = useStore((s) => s.currentUser)
   const setCurrentUser = useStore((s) => s.setCurrentUser)
+  const eventSearchQuery = useStore((s) => s.eventSearchQuery)
+  const setEventSearchQuery = useStore((s) => s.setEventSearchQuery)
   const navigate = useNavigate()
+  const location = useLocation()
+  const showSearch = location.pathname === '/' || location.pathname === '/my-events'
 
   const handleLogout = () => {
     setCurrentUser(null)
@@ -26,12 +30,28 @@ export default function Header() {
       }}
     >
       <nav style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        <Link to="/" style={{ fontWeight: 600, color: 'var(--color-text)', textDecoration: 'none' }}>
+        <Link to="/" style={{ fontWeight: 600, color: 'var(--color-text)', textDecoration: 'none', fontSize: '0.9rem' }}>
           Fil d'actualité
         </Link>
-        <Link to="/my-events" style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}>
+        <Link to="/my-events" style={{ color: 'var(--color-text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>
           Mes événements
         </Link>
+        {showSearch && (
+          <input
+            type="search"
+            value={eventSearchQuery}
+            onChange={(e) => setEventSearchQuery(e.target.value)}
+            placeholder="Rechercher des événements..."
+            style={{
+              width: 200,
+              padding: '0.35rem 0.6rem',
+              border: '1px solid var(--color-border-muted)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.8rem',
+              background: 'var(--color-bg)',
+            }}
+          />
+        )}
       </nav>
 
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>

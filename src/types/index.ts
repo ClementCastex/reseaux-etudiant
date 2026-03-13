@@ -40,3 +40,26 @@ export interface AuthState {
   isAuthenticated: boolean
   currentUser: Student | null
 }
+
+export interface Conversation {
+  id: string
+  isGroup: boolean
+  name: string | null
+  participants: { id: string; name: string; avatarUrl: string | null }[]
+  lastMessage?: { text: string; createdAt: string; senderName: string }
+}
+
+export interface Message {
+  id: string
+  text: string
+  createdAt: string
+  senderId: string
+  senderName: string
+  senderAvatarUrl: string | null
+}
+
+export interface Friendship {
+  id: string
+  studentId: string
+  friendId: string
+}
